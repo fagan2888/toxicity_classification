@@ -9,6 +9,44 @@ Created on Sun May 12 10:50:38 2019
 from constants import *
 import re
 
+from nltk.corpus import stopwords 
+from nltk.tokenize import TweetTokenizer 
+from nltk.stem.snowball import SnowballStemmer
+from nltk.stem.wordnet import WordNetLemmatizer
+
+
+def cleanText(text):
+     
+    # split into words
+    tokens = TweetTokenizer().tokenize(text)
+
+    # convert to lower case
+    tokens = [w.lower() for w in tokens]
+    
+    # filter out stop words
+    stopWords = set(stopwords.words('english'))
+    stopWords.add('can\'t')
+    words = [w for w in tokens if not w in stopWords]
+    
+    # remove punctuation from each word
+    tr = str.maketrans("", "", string.punctuation + '\n 012345689')
+    words = [w.translate(tr) for w in words]
+    
+    words = [w for w in words if len(w) > 2 and len(w) < 16 and w != '']    
+    
+    # punctuationWords = set(string.punctuation)
+    # words = [w for w in words if not w in punctuationWords]
+    
+    # lemmatisation
+    lemmatizer = WordNetLemmatizer() 
+    lemmatized = [lemmatizer.lemmatize(word) for word in words]
+
+    # stemming
+    porter = SnowballStemmer('english')
+    stemmed = [porter.stem(lemm) for lemm in lemmatized]
+    
+    return stemmed
+
 # remove space
 def remove_space(text):
     """
