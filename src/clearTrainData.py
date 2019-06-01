@@ -26,17 +26,19 @@ def balanceDatabase(train):
         if remove > 0:
             drop_indices = np.random.choice(train[(train['target'] >= a) & (train['target'] < b)].index, remove, replace=False)
             train = train.drop(drop_indices)
-            
+    
     plt.figure(figsize=(12,6))
     train.target.plot(kind='box')
     plt.figure(figsize=(12,6))    
     train.target.plot(kind='hist',bins=20)
+    
+    return train
 
 # Two class -1 and 1
 def classTarget(target):
     for index, items in target.iteritems():
         if items < 0.5:
-            target[index] = -1
+            target[index] = 0
         else:
             target[index] = 1
             
@@ -58,12 +60,14 @@ def tokenText(comments):
 
 
 train = pd.read_csv('../data/train.csv')
-balanceDatabase(train)
+train = balanceDatabase(train)
 comments = train['comment_text'].copy()
 target = train['target'].copy()
+del train
 classTarget(target)
 commentsWords = tokenText(comments)
 data = pd.concat([commentsWords, target], axis=1)
-data.reset_index(drop=True)
-data.to_csv('../data/data.csv')
+#data.reset_index(drop=True)
+data.to_pickle("../data/data.pkl")
+#data.to_csv('../data/data.csv', index=False)
 
