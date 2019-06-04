@@ -6,8 +6,9 @@ Created on Fri May 31 18:48:01 2019
 @author: willian
 """     
 
-import math        
-        
+import pandas as pd
+import numpy as np
+
 def computeTFDict(comment):
     """ Returns a tf dictionary for each comment whose keys are all 
     the unique words in the review and whose values are their 
@@ -47,7 +48,7 @@ def computeIDFDict(countDict, lenData):
     """
     idfDict = {}
     for word in countDict:
-        idfDict[word] = math.log(lenData / countDict[word])
+        idfDict[word] = np.log(lenData / countDict[word])
     return idfDict
 
 def computeTFIDFDict(commentTFDict, idfDict):
@@ -62,7 +63,7 @@ def computeTFIDFDict(commentTFDict, idfDict):
 
     return commentTFIDFDict
 
-def computeTFIDFVector(review):
+def computeTFIDFVector(review, wordDict):
       tfidfVector = [0.0] * len(wordDict)
      
       # For each unique word, if it is in the review, store its TF-IDF value.
@@ -70,3 +71,40 @@ def computeTFIDFVector(review):
           if word in review:
               tfidfVector[i] = review[word]
       return tfidfVector
+
+
+data = pd.read_pickle('../data/data.pkl')
+
+#Calculates the tf of terms
+tfDict = data.comment_text.apply(lambda x: computeTFDict(x))
+
+#Stores the review count dictionary
+countDict = computeCountDict(data.comment_text)        
+#Remove words with frequency <= 1
+for key, value in list(countDict.items()):
+    if value <= 1:
+        countDict.pop(key)
+        
+    
+#Stores the idf dictionary
+idfDict = computeIDFDict(countDict, len(data.comment_text))
+
+#Stores the TF-IDF dictionaries
+tfidfDict = [computeTFIDFDict(comment, idfDict) for comment in tfDict]
+
+# Create a list of unique words
+wordDict = sorted(countDict.keys())
+
+train = np.zeros((len(tfidfDict), len(wordDict) + 1))
+
+index = 0
+for review, target in zip(tfidfDict, data.target):
+    a = computeTFIDFVector(review, wordDict)
+    a.append(target)
+    train[index, :] = a
+    index += 1
+    
+wordDict.append('target')
+traindata = pd.DataFrame(train, columns=wordDict)
+
+traindata.to_csv('../data/tfidfdata.csv', index=False)
