@@ -90,7 +90,7 @@ mispell_dict = {'SB91':'senate bill','tRump':'trump','utmterm':'utm term','FakeN
 
 special_punc_mappings = {"—": "-", "–": "-", "_": "-", '”': '"', "″": '"', '“': '"', '•': '.', '−': '-',
                          "’": "'", "‘": "'", "´": "'", "`": "'", '\u200b': ' ', '\xa0': ' ','،':'','„':'',
-                         '…': ' ... ', '\ufeff': ''}
+                         '…': ' ... ', '\ufeff': '', 'н': 'h', 'м': 'm', 'ѕ': 's', 'т': 't', 'в': 'b', 'υ': 'u', 'ι': 'i', 'ʏ': 'y','ʜ':'h','ᴇ':'e','ʙ':'b','ɴ':'n','ᴏ':'o','ᴜ':'u','ᴛ':'t','ᴜ':'u','ʟ':'l','ʀ':'r','ᴊ':'j','ғ':'f','ᴡ':'w', 'ᴋ':'k','ᴍ':'m','ᴄ':'c'}
 
 spaces = ['\u200b', '\u200e', '\u202a', '\u202c', '\ufeff', '\uf0d8', '\u2061', '\x10', '\x7f', '\x9d', '\xad', '\xa0']
 
@@ -122,7 +122,7 @@ extra_punct = [
     '▪', '†', '■', '’', '▀', '¨', '▄', '♫', '☆', 'é', '¯', '♦', '¤', '▲',
     'è', '¸', '¾', 'Ã', '⋅', '‘', '∞', '∙', '）', '↓', '、', '│', '（', '»',
     '，', '♪', '╩', '╚', '³', '・', '╦', '╣', '╔', '╗', '▬', '❤', 'ï', 'Ø',
-    '¹', '≤', '‡', '√', '«', '»', '´', 'º', '¾', '¡', '§', '£', '₤']
+    '¹', '≤', '‡', '√', '«', '»', '´', 'º', '¾', '¡', '§', '£', '₤','►','┣','┫','Е','┗','Ｏ','━','❥']
 
 #PS there are few redundant things as well as added a couple of them to mimic Trump stuffs, better to keep them all, who knows how's the test set is..
 bad_case_words = {'nationalpost':'national post','businessinsider':'business insider','jewprofits': 'jew profits', 'QMAS': 'Quality Migrant Admission Scheme', 'casterating': 'castrating',

@@ -54,9 +54,10 @@ def tokenText(comments):
     comments = comments.apply(lambda x: correct_spelling(x, mispell_dict))
     comments = comments.apply(lambda x: clean_text(x))
     comments = comments.apply(lambda x: clean_number(x)) #incas
-    commentsWords = comments.apply(lambda x: cleanText(x))    
+    #commentsWords = comments.apply(lambda x: cleanText(x))    
     
-    return commentsWords
+    #return commentsWords
+    return comments
 
 
 train = pd.read_csv('../data/train.csv')
@@ -68,6 +69,7 @@ classTarget(target)
 commentsWords = tokenText(comments)
 data = pd.concat([commentsWords, target], axis=1)
 #data.reset_index(drop=True)
-data.to_pickle("../data/data.pkl")
+data.to_pickle("../data/data2.pkl")
 #data.to_csv('../data/data.csv', index=False)
+
 

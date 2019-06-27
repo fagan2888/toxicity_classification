@@ -180,6 +180,9 @@ def preprocess(text):
     preprocess text main steps
     """
     text = remove_space(text)
+    text = remove_diacritics(text)
+    text = correct_contraction(text, contraction_mapping)
+    text = correct_spelling(text, bad_case_words)    
     text = clean_special_punctuations(text)
     text = clean_number(text)
     text = pre_clean_rare_words(text)
@@ -200,7 +203,7 @@ def clean_text(x):
     for punct in '&':
         if punct in x:
             x = x.replace(punct, f' {punct} ')
-    for punct in '?!-,"#$%\'()*+-/:;<=>@[\\]^_`{|}~–—✰«»§✈➤›☭✔½☺éïà😏🤣😢😁🙄😃😄😊😜😎😆💙👍🤔😅😡▀▄·―═►♥▬' + '“”’': 
+    for punct in '❤️★►┣┫Е┗Ｏ━❥?✔!-"#$%\'()*+-/:;<=>@[\\]^_`{|}~–—✰«»§✈➤›☭✔½☺éïà😏🤣😢😁🙄😃😄😊😜😎😆💙👍🤔😅😡▀▄·―═►♥▬' + '“”’': 
         #if we add . here then all the WEBPAGE LINKS WILL VANISH WE DON'T WANT THAT
         if punct in x: #can be used a FE for emojis but here we are just removing them..
             x = x.replace(punct, '')

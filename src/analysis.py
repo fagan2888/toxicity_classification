@@ -11,7 +11,70 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from wordcloud import WordCloud, STOPWORDS
+
+# import wordcloud
+from wordcloud import WordCloud
+# import NLTK mainly for stopwords
+import nltk
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+
+# this function returns a tuple (toxic comments, non toxic comments) for the peaks
+def get_comments(identity, identity_peaks_df):
+    # create an empty array to return comments
+    toxic_comments, non_toxic_comments = np.array([]), np.array([])
+    # go over all the dates and grab the relevant comments for the given identity
+    for dt in identity_peaks_df.index:
+        # get the toxic comments
+        comments_dt_df = comments_with_date_df[(comments_with_date_df['created_date'] == dt) \
+                                               & (comments_with_date_df[identity] > 0) \
+                                               & (comments_with_date_df['target'] >= .5)]
+        toxic_comments = np.append(toxic_comments, comments_dt_df['comment_text'].values)
+        
+        # get the non toxic comments
+        comments_dt_df = comments_with_date_df[(comments_with_date_df['created_date'] == dt) \
+                                               & (comments_with_date_df[identity] > 0) \
+                                               & (comments_with_date_df['target'] < .5)]
+        non_toxic_comments = np.append(non_toxic_comments, comments_dt_df['comment_text'].values)
+    
+    return (toxic_comments, non_toxic_comments)
+
+# we will write a simple function to generate the wordcloud per identity group
+def generate_word_cloud(identity, toxic_comments, non_toxic_comments):
+    # convert stop words to sets as required by the wordcloud library
+    stop_words = set(stopwords.words("english"))
+    # create toxic wordcloud
+    wordcloud_toxic = WordCloud(max_font_size=100, max_words=100, background_color="white", stopwords=stop_words).generate(toxic_comments)
+    # create non-toxic wordcloud
+    wordcloud_non_toxic = WordCloud(max_font_size=100, max_words=100, background_color="white", stopwords=stop_words).generate(non_toxic_comments)
+    # draw the two wordclouds side by side using subplot
+    fig = plt.figure(figsize=[15,5])
+    fig.add_subplot(1, 2, 1).set_title("Toxic Wordcloud", fontsize=10)
+    plt.imshow(wordcloud_toxic, interpolation="bilinear")
+    plt.axis("off")
+    fig.add_subplot(1, 2, 2).set_title("Non Toxic Wordcloud", fontsize=10)
+    plt.imshow(wordcloud_non_toxic, interpolation="bilinear")
+    plt.axis("off")
+    plt.subplots_adjust(top=0.85)
+    plt.suptitle('Word Cloud'.format(identity), size = 16)
+    
+    plt.savefig('word.eps')
+    plt.show()
+
+
+
+train = pd.read_csv('../data/train.csv')
+
+toxic_comments = train[train['target'] >= .5]['comment_text'].values
+non_toxic_comments = train[train['target'] < .5]['comment_text'].values
+toxic_comments = ' '.join(toxic_comments)
+non_toxic_comments = ' '.join(non_toxic_comments)
+generate_word_cloud('All', toxic_comments, non_toxic_comments)
+
+
+
 
 toxic_subtypes = ['severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat', 'sexual_explicit']
 identities = ['asian', 'atheist', 'bisexual',
@@ -57,17 +120,12 @@ def show_wordcloud(data, title = None):
     plt.show()
 
 
-train = pd.read_csv('../data/train.csv')
-
-
 train.shape, (train['target'] > 0).sum() / train.shape[0], (train['target'] >= 0.5).sum() / train.shape[0]
 train['comment_text'].value_counts().head(20)
 
 
-
 plt.figure(figsize=(12,6))
 plot = train.target.plot(kind='hist',bins=10)
-
 ax = plot.axes
 
 for p in ax.patches:
@@ -86,7 +144,7 @@ plt.show()
 train = convert_dataframe_to_bool(train)
 
 
-plt.figure(figsize=(12,6))
+plt.figure(figsize=(12,12))
 plot = sns.countplot(x='target', data=pd.DataFrame(train['target'].map({True:'Toxic', False:'Non-toxic'}), columns=['target']))
 
 ax = plot.axes
@@ -101,9 +159,11 @@ for p in ax.patches:
                 xytext=(0,7), 
                 textcoords='offset points')
     
-plt.title('Target Distribution (Binary)')
+plt.title('Target Distribution')
+plt.tight_layout()
 plt.show()
 
+plt.savefig('dist.eps')
 
 stopwords = set(STOPWORDS)
 
